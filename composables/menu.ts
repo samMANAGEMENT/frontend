@@ -5,6 +5,13 @@ export const menuItems = [
       to: '/dashboard',
     },
     {
+      title: 'Empleos',
+      icon: 'mdi-briefcase',
+      children: [
+        { title: 'Empleos', to: '/empleos/Empleos' },
+      ],
+    },
+    {
       title: 'Usuarios',
       icon: 'mdi-account-group',
       children: [
