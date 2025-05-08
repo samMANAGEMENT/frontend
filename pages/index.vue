@@ -42,11 +42,10 @@
           Iniciar sesión
         </v-btn>
 
-
         <v-card-text class="text-center">
-          <a class="text-blue-800 text-decoration-none" href="#" rel="noopener noreferrer" target="_blank">
+          <NuxtLink class="text-blue-800 text-decoration-none" to="/register">
             Regístrate ahora <v-icon icon="mdi-chevron-right"></v-icon>
-          </a>
+          </NuxtLink>
         </v-card-text>
       </v-card>
     </div>
