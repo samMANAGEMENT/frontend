@@ -5,11 +5,10 @@ export const menuItems = [
       to: '/dashboard',
     },
     {
-      title: 'Usuarios',
+      title: 'Admin',
       icon: 'mdi-account-group',
       children: [
-        { title: 'Lista de Usuarios', to: '/users' },
-        { title: 'Crear Usuario', to: '/users/create' },
+        {title: 'Usuarios', to: '/Admin' }
       ],
     },
     {
