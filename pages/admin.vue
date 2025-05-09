@@ -1,3 +1,93 @@
+<template>
+  <v-app>
+    <v-navigation-drawer v-model="drawer" app :temporary="mdAndDown">
+      <v-list>
+        <v-list-item>
+          <v-list-item-title class="text-h6">AgricultorUTAO</v-list-item-title>
+        </v-list-item>
+
+        <v-list-group value="Usuarios">
+          <template #activator="{ props }">
+            <v-list-item v-bind="props" prepend-icon="mdi-account-group" title="Usuarios" />
+          </template>
+          <v-list-item title="Lista de Usuarios" @click="listUser" />
+          <v-list-item title="Crear Usuario" @click="createUser" />
+        </v-list-group>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-app-bar app color="blue-darken-3" dark>
+      <v-app-bar-nav-icon @click="drawer = !drawer" />
+      <v-toolbar-title>Panel de Administración</v-toolbar-title>
+    </v-app-bar>
+
+   
+    <v-main>
+      <v-container>
+        <v-card class="mt-5">
+          <v-card-title>
+            Lista de Usuarios
+            <v-spacer />
+            <v-btn color="primary" @click="createUser">
+              <v-icon start>mdi-account-plus</v-icon> Crear Usuario
+            </v-btn>
+          </v-card-title>
+
+          <v-data-table
+            :headers="headers"
+            :items="users"
+            :loading="loading"
+            loading-text="Cargando..."
+          >
+            <template #item.tipo_usuario="{ item }">
+              {{ getTipoUsuario(item.tipo_id) }}
+            </template>
+            <template #item.estado="{ item }">
+              <v-chip :color="item.estado ? 'green' : 'red'">{{ item.estado ? 'Activo' : 'Inactivo' }}</v-chip>
+            </template>
+            <template #item.actions="{ item }">
+              <v-btn icon color="info" @click="editUser(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+              <v-btn icon color="red" @click="deleteUser(item)"><v-icon>mdi-delete</v-icon></v-btn>
+            </template>
+          </v-data-table>
+        </v-card>
+      </v-container>
+    </v-main>
+
+   
+    <v-dialog v-model="dialog" max-width="650px" persistent>
+      <v-card>
+        <v-card-title>{{ formTitle }}</v-card-title>
+        <v-card-text>
+          <UserForm
+            ref="form"
+            :editedItem="editedItem"
+            :editedIndex="editedIndex"
+            :tiposUsuario="tiposUsuario"
+            :tiposDocumento="tiposDocumento"
+            @submit="saveUser"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click="close">Cancelar</v-btn>
+          <v-btn 
+            color="blue" 
+            dark 
+            @click="saveUser" 
+            :loading="saving"
+          >
+            <v-icon left>mdi-content-save</v-icon>
+            Guardar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-app>
+</template>
+
+
+
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
 import { useToast } from 'vue-toastification'
@@ -8,14 +98,14 @@ import * as rules from '@/utils/validationRules.js'
 const toast = useToast()
 const { mdAndDown } = useDisplay()
 
-// Refs de estado
+
 const drawer = ref(true)
 const dialog = ref(false)
 const saving = ref(false)
 const form = ref(null)
 const editedIndex = ref(-1)
 
-// Datos para selects
+
 const tiposDocumento = ref([
   { text: 'Cédula de Ciudadanía', value: 1 },
   { text: 'Tarjeta de Identidad', value: 2 },
@@ -144,17 +234,15 @@ const saveUser = async () => {
       dni: String(editedItem.value.dni) // Asegura que DNI sea string
     }
     
-    // No enviar password en edición si está vacío
     if (editedIndex.value > -1 && !payload.password) {
       delete payload.password
     }
 
-    // Petición condicional
     const response = editedIndex.value > -1
       ? await $axios.put(`/usuarios/${payload.id}`, payload)
       : await $axios.post('/register', payload)
 
-    // Manejo de respuesta
+  
     if (response.data) {
       toast.success(editedIndex.value > -1 ? 'Usuario actualizado' : 'Usuario creado')
       close()
@@ -171,92 +259,3 @@ const saveUser = async () => {
   }
 }
 </script>
-
-<template>
-  <v-app>
-    <!-- Drawer y AppBar -->
-    <v-navigation-drawer v-model="drawer" app :temporary="mdAndDown">
-      <v-list>
-        <v-list-item>
-          <v-list-item-title class="text-h6">AgricultorUTAO</v-list-item-title>
-        </v-list-item>
-
-        <v-list-group value="Usuarios">
-          <template #activator="{ props }">
-            <v-list-item v-bind="props" prepend-icon="mdi-account-group" title="Usuarios" />
-          </template>
-          <v-list-item title="Lista de Usuarios" @click="listUser" />
-          <v-list-item title="Crear Usuario" @click="createUser" />
-        </v-list-group>
-      </v-list>
-    </v-navigation-drawer>
-
-    <v-app-bar app color="blue-darken-3" dark>
-      <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <v-toolbar-title>Panel de Administración</v-toolbar-title>
-    </v-app-bar>
-
-    <!-- Contenido principal -->
-    <v-main>
-      <v-container>
-        <v-card class="mt-5">
-          <v-card-title>
-            Lista de Usuarios
-            <v-spacer />
-            <v-btn color="primary" @click="createUser">
-              <v-icon start>mdi-account-plus</v-icon> Crear Usuario
-            </v-btn>
-          </v-card-title>
-
-          <v-data-table
-            :headers="headers"
-            :items="users"
-            :loading="loading"
-            loading-text="Cargando..."
-          >
-            <template #item.tipo_usuario="{ item }">
-              {{ getTipoUsuario(item.tipo_id) }}
-            </template>
-            <template #item.estado="{ item }">
-              <v-chip :color="item.estado ? 'green' : 'red'">{{ item.estado ? 'Activo' : 'Inactivo' }}</v-chip>
-            </template>
-            <template #item.actions="{ item }">
-              <v-btn icon color="info" @click="editUser(item)"><v-icon>mdi-pencil</v-icon></v-btn>
-              <v-btn icon color="red" @click="deleteUser(item)"><v-icon>mdi-delete</v-icon></v-btn>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-container>
-    </v-main>
-
-    <!-- Diálogo de formulario -->
-    <v-dialog v-model="dialog" max-width="650px" persistent>
-      <v-card>
-        <v-card-title>{{ formTitle }}</v-card-title>
-        <v-card-text>
-          <UserForm
-            ref="form"
-            :editedItem="editedItem"
-            :editedIndex="editedIndex"
-            :tiposUsuario="tiposUsuario"
-            :tiposDocumento="tiposDocumento"
-            @submit="saveUser"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="close">Cancelar</v-btn>
-          <v-btn 
-            color="blue" 
-            dark 
-            @click="saveUser" 
-            :loading="saving"
-          >
-            <v-icon left>mdi-content-save</v-icon>
-            Guardar
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-app>
-</template>
