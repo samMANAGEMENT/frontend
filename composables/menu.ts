@@ -15,12 +15,14 @@ export const menuItems = [
     title: 'Admin',
     icon: 'mdi-account-group',
     children: [
-      { title: 'Usuarios', to: '/Admin' }
+      { title: 'Usuarios', to: '/Admin' }, // Tu versión
+      { title: 'Lista de Usuarios', to: '/users' }, // Del remoto
+      { title: 'Crear Usuario', to: '/users/create' }, // Del remoto
     ],
   },
   {
     title: 'Configuraciones',
     icon: 'mdi-cog',
     to: '/settings',
-  },
+   },
 ]
