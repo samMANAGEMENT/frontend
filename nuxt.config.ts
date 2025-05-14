@@ -3,6 +3,9 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
 compatibilityDate: "2024-11-01",
+  plugins: [
+    '~/plugins/axios.global.ts',
+  ],
   build: {
     transpile: ['vuetify'],
   },
