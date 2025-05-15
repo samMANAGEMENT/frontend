@@ -4,10 +4,6 @@
       <h2 class="form-title">Registro de Usuario</h2>
       <form @submit.prevent="registrarUsuario" class="form-content">
         <div class="form-grid">
-          <div class="input-group">
-            <label for="id">ID</label>
-            <input id="id" v-model="id" type="text" required />
-          </div>
 
           <div class="input-group">
             <label for="dni">DNI</label>
@@ -38,9 +34,9 @@
             <label for="tipoUsuario">Tipo de usuario</label>
             <select id="tipoUsuario" v-model="tipoUsuario" required>
               <option value="" disabled selected>Seleccione tipo de usuario</option>
-              <option value="agricultor">Agricultor</option>
-              <option value="minorista">Minorista</option>
-              <option value="conductor">Conductor</option>
+              <option value="1">Agricultor</option>
+              <option value="2">Minorista</option>
+              <option value="3">Conductor</option>
             </select>
           </div>
 
@@ -79,7 +75,6 @@ import axios from '@/plugins/axios.global'
 
 const router = useRouter()
 
-const id = ref('')
 const dni = ref('')
 const nombre = ref('')
 const email = ref('')
@@ -97,20 +92,18 @@ const registrarUsuario = async () => {
   }
 
   try {
-    await axios.post('/auth/register', {
-      id: id.value,
+    await $axios.post('/auth/register', {
       dni: dni.value,
       nombre: nombre.value,
       email: email.value,
       telefono: telefono.value,
       direccion: direccion.value,
-      tipo_usuario: tipoUsuario.value,
+      tipo_id: Number(tipoUsuario.value),
       fecha_registro: fechaRegistro.value,
       password: password.value
     })
 
     alert('Registro exitoso')
-    router.push('/login')
   } catch (error) {
     alert('Error al registrar usuario')
     console.error(error)
@@ -130,7 +123,7 @@ const registrarUsuario = async () => {
 
 .registro-container {
   width: 100%;
-  max-width: 800px; /* Más ancho que antes (era 500px) */
+  max-width: 800px;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -230,7 +223,7 @@ const registrarUsuario = async () => {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .registro-container {
     padding: 2rem;
     max-width: 100%;
